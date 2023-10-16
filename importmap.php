@@ -18,4 +18,7 @@ return [
         'path' => 'app.js',
         'preload' => true,
     ],
+    'alpinejs' => [
+        'url' => 'https://cdn.jsdelivr.net/npm/alpinejs@3.13.1/+esm',
+    ],
 ];
