@@ -79,8 +79,7 @@
         }
     },
     "require-dev": {
-        "doctrine/doctrine-fixtures-bundle": "^3.4",
-        "symfony/maker-bundle": "^1.51",
-        "zenstruck/foundry": "^1.35"
+        "hautelook/alice-bundle": "^2.12",
+        "symfony/maker-bundle": "^1.51"
     }
 }

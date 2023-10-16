@@ -1,0 +1,17 @@
+App\Entity\Movie:
+    movie{1..5}:
+        title: <realText(30)>
+        description: <realtext()>
+        poster: '@media*'
+        details:
+            # year and month are separated because some pages only need year
+            releaseYear: <year()>
+            releaseMonth: <monthname()>
+            runtime: <numberbetween(60, 250)>  # in minutes
+            genre: [<word()>, <word()>, <word()>']
+        movieCast:
+            director: <firstname()> <lastname()>
+            writer: <firstname()> <lastname()>
+            stars: [<firstname()> <lastname()>, <firstname()> <lastname()>]
+        rating: <randomfloat(1, 0, 5)>
+        ratingsCount: <randomNumber()>
