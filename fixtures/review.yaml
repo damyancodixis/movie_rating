@@ -1,0 +1,6 @@
+App\Entity\Review:
+    review{1..50}:
+        createdAt: <(new DateTimeImmutable())>
+        createdBy: '@user*'
+        movie: '@movie*'
+        rating: <numberbetween(0, 5)>
