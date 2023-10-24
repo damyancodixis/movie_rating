@@ -20,8 +20,8 @@ class MovieController extends AbstractController
     ) {
     }
 
-    #[Route('/movies', methods: ['GET'], name: 'movies_get_collection')]
-    public function getCollection(#[MapQueryParameter] string $page = '1')
+    #[Route('/movies', methods: ['GET'], name: 'homepage')]
+    public function homePage(#[MapQueryParameter] string $page = '1')
     {
         if (!ctype_digit($page)) {
             throw new BadRequestHttpException("Query parameter 'page' is missing or invalid");
@@ -38,8 +38,8 @@ class MovieController extends AbstractController
         );
     }
 
-    #[Route('/movies/{id}', methods: ['GET'], name: 'movies_get_item')]
-    public function getItem(string $id)
+    #[Route('/movies/{id}', methods: ['GET'], name: 'movie_details_page')]
+    public function movieDetailsPage(string $id)
     {
         $movie = $this->movieRepository->find($id);
 
