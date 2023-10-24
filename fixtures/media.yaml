@@ -1,5 +1,5 @@
 App\Entity\Media:
     media{1..10}:
-        filename: <realtext(15)>
-        originalFilename: <realtext(15)>
+        filename: test_poster.png
+        originalFilename: test_poster.png
         createdAt: <(new DateTimeImmutable('now'))>
