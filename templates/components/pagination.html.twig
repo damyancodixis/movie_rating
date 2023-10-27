@@ -2,7 +2,7 @@
 
 {% block body %}
     {# Pagination component. Parameters needed:
-        objectsCount - the total number of objects in the current table
+        totalItems - the total number of objects in the current table
         page - the current page
         perPage - number of objects per page
         totalPages - the total number of pages for the table
@@ -19,9 +19,9 @@
                     Showing
                     <span class="font-medium">{{1 + (perPage * page) - perPage}}</span>
                     to
-                    <span class="font-medium">{{objectsCount > page * perPage ? page * perPage : objectsCount}}</span>
+                    <span class="font-medium">{{totalItems > page * perPage ? page * perPage : totalItems}}</span>
                     of
-                    <span class="font-medium">{{objectsCount}}</span>
+                    <span class="font-medium">{{totalItems}}</span>
                     results
                 </p>
             </div>
