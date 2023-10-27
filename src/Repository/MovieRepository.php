@@ -14,10 +14,16 @@ class MovieRepository extends ServiceEntityRepository
         parent::__construct($registry, Movie::class);
     }
 
-    public function findPaginated(int $page, int $perPage): Paginator
+    public function findPaginated(int $page, int $perPage, string $title = null): Paginator
     {
         $queryBuilder = $this
             ->createQueryBuilder('m');
+
+        if ($title) {
+            $queryBuilder
+                ->andWhere('LOWER(m.title) LIKE :title')
+                ->setParameter('title', '%' . strtolower($title) . '%');
+        }
 
         $queryBuilder
             ->setFirstResult(($page - 1) * $perPage)

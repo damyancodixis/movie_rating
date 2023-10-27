@@ -21,19 +21,43 @@ class MovieController extends AbstractController
     }
 
     #[Route('/movies', methods: ['GET'], name: 'homepage')]
-    public function homePage(#[MapQueryParameter] string $page = '1')
-    {
-        if (!ctype_digit($page)) {
-            throw new BadRequestHttpException("Query parameter 'page' is missing or invalid");
+    public function homePage(
+        #[MapQueryParameter] string $page = '1',
+        #[MapQueryParameter] string|null $title = null,
+    ) {
+        if (!ctype_digit($page) || $page < 1) {
+            throw new BadRequestHttpException("Query parameter 'page' is invalid");
         }
 
-        $paginatedResult = $this->movieRepository->findPaginated($page, self::MOVIES_PER_PAGE);
+        $paginatedResult = $this->movieRepository->findPaginated($page, self::MOVIES_PER_PAGE, $title);
+
+        // If there are no movies in paginated result
+        if (iterator_count($paginatedResult->getIterator()) === 0) {
+            return $this->render(
+                'pages/not_found.html.twig',
+                [
+                    'searchProp' => 'title',
+                    // Will be displayed in the not found message for clarification
+                    'objectsNotFound' => 'movies',
+                    // Must be the same as 'name' prop of #Route attribute
+                    'routeName' => 'homepage'
+                ]
+            );
+        }
+
+        $totalPages = ceil(count($paginatedResult) / self::MOVIES_PER_PAGE);
 
         return $this->render(
-            'home.html.twig',
+            'pages/home.html.twig',
             [
                 'movies' => $paginatedResult,
                 'page' => $page,
+                'perPage' => self::MOVIES_PER_PAGE,
+                'totalPages' => $totalPages,
+                // Must be the same as 'name' prop of #Route attribute
+                'routeName' => 'homepage',
+                'searchProp' => 'title',
+                'objectsCount' => count($paginatedResult)
             ]
         );
     }
