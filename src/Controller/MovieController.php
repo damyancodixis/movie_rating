@@ -30,21 +30,6 @@ class MovieController extends AbstractController
         }
 
         $paginatedResult = $this->movieRepository->findPaginated($page, self::MOVIES_PER_PAGE, $title);
-
-        // If there are no movies in paginated result
-        if (count($paginatedResult) === 0 ) {
-            return $this->render(
-                'pages/not_found.html.twig',
-                [
-                    'searchProp' => 'title',
-                    // Will be displayed in the not found message for clarification
-                    'objectsNotFound' => 'movies',
-                    // Must be the same as 'name' prop of #Route attribute
-                    'routeName' => 'homepage'
-                ]
-            );
-        }
-
         $totalPages = ceil(count($paginatedResult) / self::MOVIES_PER_PAGE);
 
         return $this->render(
