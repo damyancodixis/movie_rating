@@ -1,6 +1,14 @@
 App\Entity\Review:
-    review{1..50}:
-        createdAt: <(new DateTimeImmutable())>
+    # Create 1000 reviews, of which 200 will have null value for title and content
+    review{1..1000}:
+        createdAt: '<dateTimeBetween("-20 years", "now")>'
+        createdBy: '@user*'
+        movie: '@movie*'
+        rating: <numberbetween(0, 5)>
+        title: <realText(30)>
+        content: <realText()>
+    review{1..200}:
+        createdAt: '<dateTimeBetween("-20 years", "now")>'
         createdBy: '@user*'
         movie: '@movie*'
         rating: <numberbetween(0, 5)>
