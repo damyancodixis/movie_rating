@@ -21,6 +21,7 @@ class ReviewRepository extends ServiceEntityRepository
             ->andWhere('r.movie = :movieId')
             ->setParameter('movieId', $movieId)
             ->andWhere('r.title IS NOT NULL')
+            ->orderBy('r.createdAt', 'DESC')
             ->setFirstResult(($page - 1) * $perPage)
             ->setMaxResults($perPage);
 

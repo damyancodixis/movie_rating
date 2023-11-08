@@ -52,7 +52,7 @@
             </div>
         </div>
 
-        {# Reviews #}
+        {# Reviews section #}
         <div>
             <div class="flex justify-between items-center mb-5">
                 <h1 class="text-lg text-white">
@@ -99,7 +99,7 @@
             {% endif %}
         </div>
 
-        {# Rate menu #}
+        {# Rate dialog #}
         <div class="relative z-10 text-white" aria-labelledby="modal-title" role="dialog" aria-modal="true" 
             x-show="rateMenuOpen"
         >
@@ -111,7 +111,7 @@
                         @click.outside="rateMenuOpen = false"
                     >
                         <p class="text-gray-300">{{ movie.title }}</p>
-                        {% include "components/rate-menu.html.twig" %}
+                        {% include "components/star-rating.html.twig" %}
                         <div class="mt-5 sm:mt-6">
                             <button type="button" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-6 py-3 text-lg font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                                 Rate
@@ -122,7 +122,7 @@
             </div>
         </div>
 
-        {# Review menu #}
+        {# Review dialog #}
         <div class="relative z-10 text-white" aria-labelledby="modal-title" role="dialog" aria-modal="true" x-show="reviewMenuOpen">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
@@ -146,7 +146,7 @@
                             </div>
 
                             <div name="rating" class="mt-2">
-                                {% include "components/rate-menu.html.twig" %}
+                                {% include "components/star-rating.html.twig" %}
                             </div>
 
                             <button type="submit" class="rounded-md bg-indigo-500 px-6 py-2.5 text-lg font-medium text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">

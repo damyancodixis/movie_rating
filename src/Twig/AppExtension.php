@@ -20,11 +20,10 @@ class AppExtension extends AbstractExtension
         if ($number >= 1_000_000) {
             return round($number / 1_000_000, 1) . 'M';
         }
-        else if ($number >= 100_000) {
+        if ($number >= 100_000) {
             return round($number / 1000) . 'K';
         }
-        else {
-            return number_format($number);
-        }
+
+        return number_format($number);
     }
 }

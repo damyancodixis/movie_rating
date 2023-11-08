@@ -45,10 +45,6 @@ class MovieController extends AbstractController
                 'perPage' => self::MOVIES_PER_PAGE,
                 'totalItems' => count($paginatedResult),
                 'totalPages' => $totalPages,
-                // Must be the same as 'name' prop of #Route attribute
-                'routeName' => 'homepage',
-                // All params that come after base route
-                'urlParams' => [],
             ]
         );
     }
@@ -79,12 +75,6 @@ class MovieController extends AbstractController
                 'perPage' => self::REVIEWS_PER_PAGE,
                 'totalItems' => count($paginatedReviews),
                 'totalPages' => $totalPages,
-                // Must be the same as 'name' prop of #Route attribute
-                'routeName' => 'homepage',
-                // All params that come after base route
-                'urlParams' => [
-                    'id' => $id,
-                ],
             ]
         );
     }
