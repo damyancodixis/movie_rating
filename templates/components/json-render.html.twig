@@ -1,21 +1,20 @@
 {# Displays json field with nested json fields. Parameters needed:
 	array - the array that will be iterated for values
-	labels - the label to be displayed for each item of the array
-	propNames - the propery name for each item of the array
+	labelsAndProps - a json object with keys as labels and values as entity property names
 #}
-{% for i in range(0, labels | length - 1) %}
+{% for label, propName in labelsAndProps %}
 	<div class="flex flex-col gap-4">
-		<div class="text-white">{{ labels[i] }}:
-			{% if array[propNames[i]] is iterable %}
+		<div class="text-white">{{ label }}:
+			{% if array[propName] is iterable %}
 				{# Display each item in array, if it's not last item, display comma as well #}
-				{% for j in range(0, array[propNames[i]] | length - 1) %}
+				{% for i in range(0, array[propName]|length - 1) %}
 					<span class="text-gray-400">
-						{{array[propNames[i]][j]}}{{j == array[propNames[i]] | length - 1 ? "" : ", " }}
+						{{ array[propName][i] }}{{ i == array[propName]|length - 1 ? "" : ", " }}
 					</span>
 				{% endfor %}
 			{% else %}
 				<span class="text-gray-400">
-					{{ array[propNames[i]] }}
+					{{ array[propName] }}
 				</span>
 			{% endif %}
 		</div>

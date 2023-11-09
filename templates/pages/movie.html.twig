@@ -1,12 +1,18 @@
 {% extends "layout.html.twig" %}
 {# Add the 'released' and 'rutime' fields to the array passsed to json renderer #}
-{% set movieDetails = movie.movieCast|merge({
+{% set details = movie.movieCast|merge({
         released: movie.details.releaseMonth ~ " " ~ movie.details.releaseYear,
         runtime: movie.details.runtime|date('i')|number_format ~ 'h ' ~ movie.details.runtime|date('s') ~ 'm'
     }) 
 %}
-{% set movieDetailsLabels = ['Director', 'Writer', 'Stars', 'Released', 'Runtime'] %}
-{% set movieDetailsProps = ['director', 'writer', 'stars', 'released', 'runtime'] %}
+{# Key(label) is rendered in template, value(property name) is used to access entity property #}
+{% set detailsLabelsAndProps = {
+    'Director': 'director',
+    'Writer': 'writer',
+    'Stars': 'stars',
+    'Released': 'released',
+    'Runtime': 'runtime',
+}%}
 
 {% block content %}
     <div class="flex flex-col xl:mx-56 lg:mx-24 mx-8 my-10 gap-6"
@@ -47,7 +53,7 @@
                 <div class="text-white">{{ movie.description }}</div>
                 {% 
                     include "components/json-render.html.twig" 
-                    with { array: movieDetails, labels: movieDetailsLabels, propNames: movieDetailsProps } 
+                    with { array: details, labelsAndProps: detailsLabelsAndProps } 
                 %}
             </div>
         </div>
