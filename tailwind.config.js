@@ -5,7 +5,11 @@ module.exports = {
     "./templates/**/*.html.twig",
   ],
   theme: {
-    extend: {},
+    extend: {
+      height: {
+        '500px': '500px'
+      },
+    },
   },
   plugins: [
     require('@tailwindcss/aspect-ratio'),

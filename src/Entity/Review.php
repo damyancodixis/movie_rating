@@ -116,9 +116,14 @@ class Review
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(\DateTimeImmutable|\DateTime $createdAt): static
     {
-        $this->createdAt = $createdAt;
+        if ($createdAt instanceof \DateTime) {
+            $this->createdAt = \DateTimeImmutable::createFromMutable($createdAt);
+        }
+        else {
+            $this->createdAt = $createdAt;
+        }
 
         return $this;
     }

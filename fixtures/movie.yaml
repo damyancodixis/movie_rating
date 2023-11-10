@@ -1,5 +1,5 @@
 App\Entity\Movie:
-    movie{1..30}:
+    movie{1..120}:
         title: <realText(30)>
         description: <realtext()>
         poster: '@media*'

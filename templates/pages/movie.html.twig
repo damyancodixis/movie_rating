@@ -1,0 +1,167 @@
+{% extends "layout.html.twig" %}
+{# Add the 'released' and 'rutime' fields to the array passsed to json renderer #}
+{% set details = movie.movieCast|merge({
+        released: movie.details.releaseMonth ~ " " ~ movie.details.releaseYear,
+        runtime: movie.details.runtime|date('i')|number_format ~ 'h ' ~ movie.details.runtime|date('s') ~ 'm'
+    }) 
+%}
+{# Key(property name) is used to access entity property, value(label) is rendered in template  #}
+{% set detailsPropsAndLabels = {
+    'director': 'Director',
+    'writer': 'Writer',
+    'stars': 'Stars',
+    'released': 'Released',
+    'runtime': 'Runtime',
+}%}
+
+{% block content %}
+    <div class="flex flex-col xl:mx-56 lg:mx-24 mx-8 my-10 gap-6"
+        x-data="{reviewMenuOpen: false, rateMenuOpen: false, rating: 0}"
+    >
+        {# Movie details #}
+        <div class="flex gap-6 flex-col md:flex-row">   
+            <img src="/images/{{ movie.poster.filename }}" alt="{{ movie.title }}_poster" class="rounded-md object-cover md:h-500px"/>
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col">
+                    <div class="text-white text-2xl">{{ movie.title }}</div>
+                    <div class="text-gray-400 text-md">{{ movie.details.releaseYear }}</div>
+                </div>
+                <div class="flex items-center justify-between w-full">
+                    <div class="flex flex-col">
+                        {# Rating #}
+                        <p>
+                            <span class="text-3xl font-semibold text-indigo-400">{{ movie.rating|number_format(1) }}</span>
+                            <span class="text-2xl text-gray-500 font-light">/ 5</span>
+                        </p>
+                        {# Ratings count #}
+                        <p class="text-md text-gray-500">{{ movie.ratingsCount | shorten_number}} ratings</p>
+                    </div>
+                    <button type="button" class="rounded-md bg-indigo-500 px-6 py-2.5 text-lg font-medium text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" 
+                        @click="rateMenuOpen = true"
+                    >
+                        Rate
+                    </button>
+                </div>
+
+                <div>
+                    {% for i in range(0, movie.details.genre | length - 1) %}
+                        <span class="inline-flex items-center rounded-md bg-indigo-400/10 px-2 py-1 text-sm font-medium text-indigo-400 ring-1 ring-inset ring-indigo-400/30">
+                            {{ movie.details.genre[i] }}
+                        </span>
+                    {% endfor %}
+                </div>
+                <div class="text-white">{{ movie.description }}</div>
+                {% 
+                    include "components/json-render.html.twig" 
+                    with { array: details, propsAndLabels: detailsPropsAndLabels } 
+                %}
+            </div>
+        </div>
+
+        {# Reviews section #}
+        <div>
+            <div class="flex justify-between items-center mb-5">
+                <h1 class="text-lg text-white">
+                    {% if reviews|length > 0 %}
+                        Reviews <span class="text-gray-400 text-md">({{ reviews|length }})</span>
+                    {% else %}
+                        Be the first to review 
+                        <span class="text-indigo-400">
+                            {{ movie.title }}
+                        </span>
+                    {% endif %}
+                </h1>
+                <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-md font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" 
+                    @click="reviewMenuOpen = true"
+                >
+                    Submit a review
+                </button>
+            </div>
+            {% if reviews|length > 0 %}
+                {% for review in reviews %}
+                    <div class="p-5 rounded-xl mb-10 bg-gray-800">
+                        <div class="flex items-center mb-4 space-x-4">
+                            <div class="space-y-1 font-medium dark:text-white">
+                                <p>{{ review.createdBy.username }} </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center mb-1">
+                            {% for i in range(0, 5) %}
+                                <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none">
+                                    <g> <rect width="24" height="24" /> 
+                                        <path class="{{ review.rating > i ? 'fill-indigo-400' : 'none' }}" d="M11.5245 4.46353C11.6741 4.00287 12.3259 4.00287 12.4755 4.46353L13.9084 8.87336C13.9753 9.07937 14.1673 9.21885 14.3839 9.21885H19.0207C19.505 9.21885 19.7064 9.83866 19.3146 10.1234L15.5633 12.8488C15.3881 12.9761 15.3148 13.2018 15.3817 13.4078L16.8145 17.8176C16.9642 18.2783 16.437 18.6613 16.0451 18.3766L12.2939 15.6512C12.1186 15.5239 11.8814 15.5239 11.7061 15.6512L7.95488 18.3766C7.56303 18.6613 7.03578 18.2783 7.18546 17.8176L8.6183 13.4078C8.68524 13.2018 8.61191 12.9761 8.43667 12.8488L4.68544 10.1234C4.29358 9.83866 4.49497 9.21885 4.97933 9.21885H9.6161C9.83272 9.21885 10.0247 9.07937 10.0916 8.87336L11.5245 4.46353Z" stroke="#818cf8" stroke-linecap="round" stroke-linejoin="round"/> 
+                                    </g>
+                                </svg>
+                            {% endfor %}
+                            <h3 class="ml-2 text-sm font-semibold dark:text-white">{{ review.title }}</h3>
+                        </div>
+                        <div class="mb-5 text-sm text-gray-500 dark:text-gray-400">
+                            <p>Reviewed on {{ review.createdAt|date('j F, Y') }}</p>
+                        </div>
+                        <p class="mb-2 dark:text-gray-400">{{ review.content }}</p>
+                    </div>
+                {% endfor %}
+                {% include "components/pagination.html.twig" %}            
+            {% endif %}
+        </div>
+
+        {# Rate dialog #}
+        <div class="relative z-10 text-white" aria-labelledby="modal-title" role="dialog" aria-modal="true" 
+            x-show="rateMenuOpen"
+        >
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+
+            <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+                <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                    <div class="relative transform overflow-hidden rounded-lg bg-gray-900 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6 flex flex-col items-center"
+                        @click.outside="rateMenuOpen = false"
+                    >
+                        <p class="text-gray-300">{{ movie.title }}</p>
+                        {% include "components/star-rating.html.twig" %}
+                        <div class="mt-5 sm:mt-6">
+                            <button type="button" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-6 py-3 text-lg font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                                Rate
+                            </button>
+                        </div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+
+        {# Review dialog #}
+        <div class="relative z-10 text-white" aria-labelledby="modal-title" role="dialog" aria-modal="true" x-show="reviewMenuOpen">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+            <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+                <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                    <div class="relative transform overflow-hidden rounded-lg bg-gray-900 p-4 text-left shadow-xl transition-all sm:my-8 w-full sm:max-w-xl md:max-w-2xl sm:p-6"
+                        @click.outside="reviewMenuOpen = false"
+                    >
+                        <form @submit.prevent class="flex flex-col gap-6">
+                            <div>
+                                <label for="title" class="block text-sm font-medium leading-6">Title</label>
+                                <div class="mt-2">
+                                    <input type="text" name="title" id="title" class="bg-gray-800 block w-full rounded-md border-0 py-1.5 text-gray-300 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                                </div>
+                            </div>
+                        
+                            <div>
+                                <label for="comment" class="block text-sm font-medium leading-6">Review</label>
+                                <div class="mt-2">
+                                    <textarea rows="4" name="comment" id="comment" class="bg-gray-800 block w-full rounded-md border-0 py-1.5 text-gray-300 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                                </div>
+                            </div>
+
+                            <div name="rating" class="mt-2">
+                                {% include "components/star-rating.html.twig" %}
+                            </div>
+
+                            <button type="submit" class="rounded-md bg-indigo-500 px-6 py-2.5 text-lg font-medium text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                                Submit
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+{% endblock %}
