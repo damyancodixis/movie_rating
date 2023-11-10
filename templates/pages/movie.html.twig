@@ -5,13 +5,13 @@
         runtime: movie.details.runtime|date('i')|number_format ~ 'h ' ~ movie.details.runtime|date('s') ~ 'm'
     }) 
 %}
-{# Key(label) is rendered in template, value(property name) is used to access entity property #}
-{% set detailsLabelsAndProps = {
-    'Director': 'director',
-    'Writer': 'writer',
-    'Stars': 'stars',
-    'Released': 'released',
-    'Runtime': 'runtime',
+{# Key(property name) is used to access entity property, value(label) is rendered in template  #}
+{% set detailsPropsAndLabels = {
+    'director': 'Director',
+    'writer': 'Writer',
+    'stars': 'Stars',
+    'released': 'Released',
+    'runtime': 'Runtime',
 }%}
 
 {% block content %}
@@ -53,7 +53,7 @@
                 <div class="text-white">{{ movie.description }}</div>
                 {% 
                     include "components/json-render.html.twig" 
-                    with { array: details, labelsAndProps: detailsLabelsAndProps } 
+                    with { array: details, propsAndLabels: detailsPropsAndLabels } 
                 %}
             </div>
         </div>

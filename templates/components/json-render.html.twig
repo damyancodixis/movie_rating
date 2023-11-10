@@ -1,8 +1,8 @@
 {# Displays json field with nested json fields. Parameters needed:
 	array - the array that will be iterated for values
-	labelsAndProps - a json object with keys as labels and values as entity property names
+	propsAndLabels - a json object with keys as entity property names and values as labels 
 #}
-{% for label, propName in labelsAndProps %}
+{% for propName, label in propsAndLabels %}
 	<div class="flex flex-col gap-4">
 		<div class="text-white">{{ label }}:
 			{% if array[propName] is iterable %}
