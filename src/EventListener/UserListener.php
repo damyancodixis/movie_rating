@@ -14,12 +14,14 @@ class UserListener
 
     public function prePersist(User $user)
     {
-        $hashedPassword = $this->passwordHasher->hashPassword(
-            $user,
-            $user->getPlainPassword()
-        );
-
-        $user->setPassword($hashedPassword);
+        if ($user->getPlainPassword()) {
+            $hashedPassword = $this->passwordHasher->hashPassword(
+                $user,
+                $user->getPlainPassword()
+            );
+    
+            $user->setPassword($hashedPassword);
+        }
 
         $user->setCreatedAt(new \DateTimeImmutable('now'));
     }

@@ -1,10 +1,10 @@
 {# 5 star rate menu. Parameters needed:
     rating - the rating that the user has given
+    hoverRating - the star that is currently being hovered over
  #}
 
 <div 
     x-data="{
-        hoverRating: 0,
         ratings: [
             {'amount': 1, 'label':'Terrible'}, 
             {'amount': 2, 'label':'Bad'}, 
@@ -35,9 +35,10 @@
     }" 
     class="flex flex-col items-center justify-center space-y-2 rounded m-2 p-3 mx-auto"
 >
-    <div class="flex space-x-0" @click.outside="rating = 0; hoverRating = 0">
+    <div class="flex space-x-0">
         <template x-for="(star, index) in ratings" :key="index">
             <button 
+                type="button"
                 @click="rate(star.amount)" @mouseover="hoverRating = star.amount" @mouseleave="hoverRating = rating"
                 aria-hidden="true"
                 :title="star.label"
@@ -51,7 +52,6 @@
         </template>
     </div>
     <div class="p-2">
-        {# TODO: If the user has given a rating, display the rating instead #}
         <template x-if="rating || hoverRating">
             <p x-text="currentLabel()"></p>
         </template>
