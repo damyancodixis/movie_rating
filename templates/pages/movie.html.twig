@@ -36,7 +36,7 @@
                         {# Ratings count #}
                         <p class="text-md text-gray-500">{{ movie.ratingsCount | shorten_number}} ratings</p>
                     </div>
-                    {% if userReview %}
+                    {% if userReview and userReview.rating %}
                         <div class="flex flex-col items-center">
                             <div class="flex items-center">
                                 <p>
@@ -126,93 +126,119 @@
             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                     {# Rate Dialog #}
-                    <div class="relative transform overflow-hidden rounded-lg bg-gray-900 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6 flex flex-col items-center"
+                    <div class="relative transform overflow-hidden rounded-lg bg-gray-900 p-4 text-left shadow-xl transition-all w-full max-w-md sm:max-w-lg md:max-w-2xl sm:p-6"
                         @click.outside="dialogOpen = false"
-                        x-show="!dialogReviewMode"
                     >
-                        <p class="text-gray-300">{{ movie.title }}</p>
-                        {% include "components/star-rating.html.twig" %}
-                        <div class="mt-5 sm:mt-6">
-                            <button @click="onRateSubmit" type="button" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-6 py-3 text-lg font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                                Rate
-                            </button>
+                        <div class="flex justify-center">
+                            <p class="text-2xl text-indigo-400">{{ movie.title }}</p>
+                            <svg height="24" width="24" viewBox="0 -960 960 960" class="fill-red-400 cursor-pointer absolute top-3 right-3" @click="dialogOpen = false">
+                                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                            </svg>
                         </div>
-                        <p class="mt-10 text-center text-sm text-gray-400">
-                            Want to say what you think?
-                            <span @click="dialogReviewMode = true" class="font-semibold cursor-pointer leading-6 text-indigo-400 hover:text-indigo-300">Leave a review</span>
-                        </p>
-                    </div>
-
-                    {# Review Dialog #}
-                    <div class="relative transform overflow-hidden rounded-lg bg-gray-900 p-4 text-left shadow-xl transition-all sm:my-8 w-full sm:max-w-xl md:max-w-2xl sm:p-6"
-                        @click.outside="dialogOpen = false" x-show="dialogReviewMode"
-                    >
-                        <p class="text-red-400" x-text="reviewError"></p>
-                        <div>
-                            <label for="review-title" class="block text-sm font-medium leading-6">Title</label>
-                            <div class="mt-2">
-                                <input x-model="title" type="text" name="review-title" id="review-title" class="bg-gray-800 block w-full rounded-md border-0 py-1.5 text-gray-300 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        {% if reviewForm %}
+                            <div class="text-red-400">
+                                {{ form_errors(reviewForm) }}
                             </div>
-                        </div>
-                    
-                        <div>
-                            <label for="content" class="block text-sm font-medium leading-6">Review</label>
-                            <div class="mt-2">
-                                <textarea x-model="content" rows="4" name="content" id="content" class="bg-gray-800 block w-full rounded-md border-0 py-1.5 text-gray-300 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
-                            </div>
-                        </div>
+                            {{ form_start(reviewForm, { attr: { id: 'review_form', class: 'flex flex-col gap-5' } }) }}
+                                {{ form_row(reviewForm.rating) }}
+                                <div id="review_form_isReview_container">
+                                    {{ form_widget(reviewForm.isReview ) }}
+                                    {{ form_label(reviewForm.isReview ) }}
+                                    {{ form_errors(reviewForm.isReview ) }}
+                                </div>
 
-                        <div name="rating" class="mt-2">
-                            {% include "components/star-rating.html.twig" %}
-                        </div>
+                                {% if reviewForm.title is defined %}
+                                    <div id="review_form_title_container">
+                                        {{ form_label(reviewForm.title ) }}
+                                        {{ form_errors(reviewForm.title ) }}
+                                        {{ form_widget(reviewForm.title ) }}
+                                    </div>
 
-                        <div class="flex items-center justify-center">
-                            <button @click="onRateSubmit" type="submit" class="rounded-md bg-indigo-500 px-6 py-2.5 text-lg font-medium text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
-                                Submit
-                            </button>
-                        </div>                        
-                        <p class="mt-10 text-center text-sm text-gray-400">
-                            Don't want to write a review?
-                            <span @click="dialogReviewMode = false" class="font-semibold cursor-pointer leading-6 text-indigo-400 hover:text-indigo-300">Leave a rating only</span>
-                        </p>
+                                    <div id="review_form_content_container">
+                                        {{ form_label(reviewForm.content) }}
+                                        {{ form_errors(reviewForm.content) }}
+                                        {{ form_widget(reviewForm.content) }}
+                                    </div>
+                                {% endif %}
+                                <button type="submit" id="review_form_submit_button" class="justify-self-center self-center flex mt-5 justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                                    Submit
+                                </button>
+                            {{ form_end(reviewForm) }}
+                        {% endif %}
                     </div>
                 </div>  
             </div>
         </div>
     </div>    
     <script>
+        const isLogged = !!"{{ is_granted('IS_AUTHENTICATED_REMEMBERED') }}"
+        
+        if (isLogged) {
+            const form = document.getElementById('review_form')
+            const isReviewField = document.getElementById('review_form_isReview')
+            const csrfToken = document.getElementById('review_form__token')
+            const submitButton = document.getElementById('review_form_submit_button')
+            const userRating = '{{ userReview ? userReview.rating : null}}'
+
+            const updateForm = async (data, url, method) => {
+                const req = await fetch(url, {
+                    method: method,
+                    body: data,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'charset': 'utf-8'
+                    }
+                });
+
+                const text = await req.text();
+
+                return text;
+            };
+
+            const parseTextToHtml = (text) => {
+                const parser = new DOMParser();
+                const html = parser.parseFromString(text, 'text/html');
+
+                return html;
+            };
+
+            // This request does not create any objects. It's only purpose is
+            // determining if dynamic form fields should be rendered or not.
+            const changeMode = async (e) => {
+                const body = new URLSearchParams();
+                body.append(e.target.getAttribute('name'), e.target.checked)
+                body.append(csrfToken.getAttribute('name'), csrfToken.value)
+                body.append('changeViewRequest', 1)
+                if (userRating) {
+                    body.append('review_form[rating]', userRating)
+                }
+                const updateFormResponse = await updateForm(
+                    body, form.getAttribute('action'), 
+                    form.getAttribute('method'),
+                );
+                const html = parseTextToHtml(updateFormResponse);
+
+                const title = html.getElementById('review_form_title_container')
+                const content = html.getElementById('review_form_content_container')
+
+                if (isReviewField.checked) {
+                    form.insertBefore(title, submitButton)
+                    form.insertBefore(content, submitButton)
+                }
+                else {
+                    document.getElementById('review_form_title_container').remove()
+                    document.getElementById('review_form_content_container').remove()
+                }
+            };
+
+            isReviewField.addEventListener('change', (e) => changeMode(e));
+        }
+        
         function data() {
             return {
-                dialogOpen: false,
-                dialogReviewMode: false,
-                rating: {{ userReview ? userReview.rating : 0  }},
-                hoverRating: {{ userReview ? userReview.rating : 0  }},
-                title: "{{ userReview and userReview.title ? userReview.title|e('js')|raw : "" }}",
-                content: "{{ userReview and userReview.content ? userReview.content|e('js')|raw : "" }}",
-                reviewError: null,
-                async onRateSubmit() {
-                    const url = "{{path('movie_details_page', {'id': movie.id})}}"
-                    const res = await fetch(url, {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            rating: this.rating,
-                            title: this.title || null,
-                            content: this.content || null,
-                        })
-                    })
-
-                    if (res.ok) {
-                        this.dialogOpen = false
-                        this.dialogReviewMode = false
-                        window.location.reload();
-                    }
-                    else {
-                        const parsedRes = await res.json()
-                        this.reviewError = parsedRes.review
-                    }
-                },
+                dialogOpen: !!'{{ not reviewForm or reviewForm.vars.valid ? false : true }}',
                 openRateDialog() {
-                    if ("{{ is_granted('IS_AUTHENTICATED_REMEMBERED') }}") {
+                    if (isLogged) {
                         this.dialogOpen = true
                     }
                     else {

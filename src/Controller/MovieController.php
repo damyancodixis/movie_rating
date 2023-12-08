@@ -4,19 +4,20 @@ namespace App\Controller;
 
 use App\Entity\Movie;
 use App\Entity\Review;
+use App\Form\ReviewFormType;
 use App\Repository\MovieRepository;
 use App\Repository\ReviewRepository;
 use App\Repository\UserRepository;
 use App\Service\ValidationErrorHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class MovieController extends AbstractController
 {
@@ -29,7 +30,6 @@ class MovieController extends AbstractController
         private ReviewRepository $reviewRepository,
         private SerializerInterface $serializer,
         private UserRepository $userRepository,
-        private ValidatorInterface $validator,
         private ValidationErrorHandler $validationErrorHandler
     ) {
     }
@@ -65,23 +65,62 @@ class MovieController extends AbstractController
         #[MapQueryParameter] string $page = '1',
     ) {
         $userReview = null;
+        $form = null;
 
         if ($this->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            if ($request->isMethod(Request::METHOD_POST)) {
-                $userReview = $this->rateMovie($movie, $request);
-                if (!$userReview instanceof Review) {
-                    return $this->json($userReview, 400);
-                }
+            // Find existing review record by current user. If no record exists, create one.
+            $username = $this->getUser()->getUserIdentifier();
+            $user = $this->userRepository->findOneBy(['username' => $username]);
+            $userReview = $this->reviewRepository->findOneBy([
+                'createdBy' => $user->getId(),
+                'movie' => $movie->getId(),
+            ]);
+            if (!$userReview) {
+                $userReview = new Review();
+                $userReview->setMovie($movie);
+            }
 
-                return $this->json(null, 204);
-            } else {
-                $username = $this->getUser()->getUserIdentifier();
-                $user = $this->userRepository->findOneBy(['username' => $username]);
-                $userReview = $this->reviewRepository->findOneBy(['createdBy' => $user->getId(), 'movie' => $movie->getId()]);
+            $form = $this->createForm(
+                ReviewFormType::class,
+                $userReview,
+                [
+                    'action' => $this->generateUrl('movie_details_page', ['id' => $movie->getId()]),
+                ]
+            );
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted()) {
+                // Determine if the request is for the dynamic fields. If it is, do nothing.
+                $isChangeViewRequest = $request->request->get('changeViewRequest');
+
+                if (!$isChangeViewRequest) {
+                    $userReview = $form->getData();
+
+                    // Check if user submitted only a rating
+                    if (!$form->get('isReview')->getData()) {
+                        $userReview->setTitle(null);
+                        $userReview->setContent(null);
+                    }
+
+                    $errors = $this->validationErrorHandler->getErrors($userReview);
+
+                    if (count($errors) > 0) {
+                        foreach ($errors as $error) {
+                            $form->addError(new FormError($error));
+                        }
+                    } else {
+                        $this->entityManager->persist($userReview);
+                        $this->entityManager->flush();
+                    }
+                }
             }
         }
+        else if ($request->getMethod() === Request::METHOD_POST) {
+            throw new UnauthorizedHttpException('', 'Only registered users can rate movies');
+        }
 
-        $paginatedReviews = $this->reviewRepository->findReviewsByMovie($movie->getId(), $page, self::REVIEWS_PER_PAGE);
+        $paginatedReviews = $this->reviewRepository
+            ->findReviewsByMovie($movie->getId(), $page, self::REVIEWS_PER_PAGE);
         $totalPages = ceil(count($paginatedReviews) / self::MOVIES_PER_PAGE);
 
         return $this->render(
@@ -94,63 +133,8 @@ class MovieController extends AbstractController
                 'perPage' => self::REVIEWS_PER_PAGE,
                 'totalItems' => count($paginatedReviews),
                 'totalPages' => $totalPages,
+                'reviewForm' => $form,
             ]
         );
-    }
-
-    // Return type array is an array of all validation errors that occurred
-    private function rateMovie(Movie $movie, Request $request): Review | array
-    {
-        $newRating = $request->getPayload()->get('rating');
-        // Helper variable for calculations in case user updates his existing rating
-        $oldRating = 0;
-        $ratingsCount = $movie->getRatingsCount();
-
-        $username = $this->getUser()->getUserIdentifier();
-        $user = $this->userRepository->findOneBy(['username' => $username]);
-        // Check if user has already submitted a review
-        $review = $this->reviewRepository->findOneBy(['createdBy' => $user->getId(), 'movie' => $movie->getId()]);
-
-        if (!$review) {
-            $review = new Review();
-            $review->setMovie($movie);
-            $ratingsCount++;
-        }
-        else {
-            $oldRating = $review->getRating();
-        }
-
-        $this->serializer->deserialize(
-            $request->getContent(),
-            Review::class,
-            'json',
-            [
-                AbstractNormalizer::OBJECT_TO_POPULATE => $review,
-                'groups' => 'review'
-            ],
-        );
-
-        $reviewErrors = $this->validationErrorHandler
-            ->getValidationErrors($this->validator->validate($review));
-        if (count($reviewErrors) > 0) {
-            return $reviewErrors;
-        }
-
-        $calculatedRating =
-            ($movie->getRating() * $movie->getRatingsCount() + $newRating - $oldRating) / $ratingsCount;
-
-        $movie->setRatingsCount($ratingsCount);
-        $movie->setRating($calculatedRating);
-
-        $movieErrors = $this->validationErrorHandler
-            ->getValidationErrors($this->validator->validate($movie));
-        if (count($movieErrors) > 0) {
-            return $movieErrors;
-        }
-
-        $this->entityManager->persist($movie);
-        $this->entityManager->persist($review);
-        $this->entityManager->flush();
-        return $review;
     }
 }

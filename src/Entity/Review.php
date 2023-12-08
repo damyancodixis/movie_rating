@@ -44,6 +44,7 @@ class Review
         max: 5,
         notInRangeMessage: 'Ratings must be between {{ min }} and {{ max }}',
     )]
+    #[Assert\NotBlank(message: "Rating is required")]
     #[Groups('review')]
     private ?int $rating = null;
 
