@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b42ec65fb3ffd40b4b5198d480250582",
+    "content-hash": "a9c2a84749cab26ae1f34ee6a0039062",
     "packages": [
         {
             "name": "brick/math",
@@ -3525,16 +3525,16 @@
         },
         {
             "name": "symfony/form",
-            "version": "v6.3.5",
+            "version": "v6.3.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/form.git",
-                "reference": "0f9ad8600c1021983d096512066ee54332aa3139"
+                "reference": "e6743d188f168643cb247f65cbad09ddb1dfcfe5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/form/zipball/0f9ad8600c1021983d096512066ee54332aa3139",
-                "reference": "0f9ad8600c1021983d096512066ee54332aa3139",
+                "url": "https://api.github.com/repos/symfony/form/zipball/e6743d188f168643cb247f65cbad09ddb1dfcfe5",
+                "reference": "e6743d188f168643cb247f65cbad09ddb1dfcfe5",
                 "shasum": ""
             },
             "require": {
@@ -3602,7 +3602,7 @@
             "description": "Allows to easily create, process and reuse HTML forms",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/form/tree/v6.3.5"
+                "source": "https://github.com/symfony/form/tree/v6.3.7"
             },
             "funding": [
                 {
@@ -3618,7 +3618,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-09-10T17:47:23+00:00"
+            "time": "2023-10-28T23:11:45+00:00"
         },
         {
             "name": "symfony/framework-bundle",
@@ -6076,16 +6076,16 @@
         },
         {
             "name": "symfony/validator",
-            "version": "v6.3.5",
+            "version": "v6.3.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/validator.git",
-                "reference": "48e815ba3b5eb72e632588dbf7ea2dc4e608ee47"
+                "reference": "9cc736663fa5839b9710ac2c303bb0b951014fc1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/validator/zipball/48e815ba3b5eb72e632588dbf7ea2dc4e608ee47",
-                "reference": "48e815ba3b5eb72e632588dbf7ea2dc4e608ee47",
+                "url": "https://api.github.com/repos/symfony/validator/zipball/9cc736663fa5839b9710ac2c303bb0b951014fc1",
+                "reference": "9cc736663fa5839b9710ac2c303bb0b951014fc1",
                 "shasum": ""
             },
             "require": {
@@ -6152,7 +6152,7 @@
             "description": "Provides tools to validate values",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/validator/tree/v6.3.5"
+                "source": "https://github.com/symfony/validator/tree/v6.3.7"
             },
             "funding": [
                 {
@@ -6168,7 +6168,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-09-29T07:41:15+00:00"
+            "time": "2023-10-28T23:11:45+00:00"
         },
         {
             "name": "symfony/var-dumper",
@@ -6402,30 +6402,30 @@
         },
         {
             "name": "symfonycasts/tailwind-bundle",
-            "version": "v0.1.7",
+            "version": "v0.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SymfonyCasts/tailwind-bundle.git",
-                "reference": "affe289b5a229c10d284b5d1b7ca4270df3538e5"
+                "reference": "df70d0d1dd15a61636a479722e25fef2a4c8fe87"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SymfonyCasts/tailwind-bundle/zipball/affe289b5a229c10d284b5d1b7ca4270df3538e5",
-                "reference": "affe289b5a229c10d284b5d1b7ca4270df3538e5",
+                "url": "https://api.github.com/repos/SymfonyCasts/tailwind-bundle/zipball/df70d0d1dd15a61636a479722e25fef2a4c8fe87",
+                "reference": "df70d0d1dd15a61636a479722e25fef2a4c8fe87",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.1",
-                "symfony/asset-mapper": "^6.3",
-                "symfony/console": "^5.4|^6.3",
-                "symfony/http-client": "^5.4|^6.3",
-                "symfony/process": "^5.4|^6.3"
+                "symfony/asset-mapper": "^6.3|^7.0",
+                "symfony/console": "^5.4|^6.3|^7.0",
+                "symfony/http-client": "^5.4|^6.3|^7.0",
+                "symfony/process": "^5.4|^6.3|^7.0"
             },
             "require-dev": {
                 "phpstan/phpstan": "1.11.x-dev",
-                "symfony/filesystem": "^6.3",
-                "symfony/framework-bundle": "^6.3",
-                "symfony/phpunit-bridge": "^6.3"
+                "symfony/filesystem": "^6.3|^7.0",
+                "symfony/framework-bundle": "^6.3|^7.0",
+                "symfony/phpunit-bridge": "^6.3|^7.0"
             },
             "type": "library",
             "autoload": {
@@ -6450,9 +6450,9 @@
             ],
             "support": {
                 "issues": "https://github.com/SymfonyCasts/tailwind-bundle/issues",
-                "source": "https://github.com/SymfonyCasts/tailwind-bundle/tree/v0.1.7"
+                "source": "https://github.com/SymfonyCasts/tailwind-bundle/tree/v0.2.1"
             },
-            "time": "2023-09-02T18:42:55+00:00"
+            "time": "2023-11-08T19:29:49+00:00"
         },
         {
             "name": "twig/extra-bundle",

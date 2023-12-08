@@ -16,7 +16,7 @@
 
 {% block content %}
     <div class="flex flex-col xl:mx-56 lg:mx-24 mx-8 my-10 gap-6"
-        x-data="{reviewMenuOpen: false, rateMenuOpen: false, rating: 0}"
+        x-data="data()"
     >
         {# Movie details #}
         <div class="flex gap-6 flex-col md:flex-row">   
@@ -36,11 +36,29 @@
                         {# Ratings count #}
                         <p class="text-md text-gray-500">{{ movie.ratingsCount | shorten_number}} ratings</p>
                     </div>
-                    <button type="button" class="rounded-md bg-indigo-500 px-6 py-2.5 text-lg font-medium text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" 
-                        @click="rateMenuOpen = true"
-                    >
-                        Rate
-                    </button>
+                    {% if userReview and userReview.rating %}
+                        <div class="flex flex-col items-center">
+                            <div class="flex items-center">
+                                <p>
+                                    <span class="text-5xl font-semibold text-indigo-400">{{ userReview.rating }}</span>
+                                </p>
+                                <button type="button" class="ml-5 rounded-lg bg-indigo-500 w-6 h-6 flex items-center justify-center"
+                                    @click="openRateDialog"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" width="15px" height="15px">
+                                        <path class="fill-white" d="M 19.171875 2 C 18.448125 2 17.724375 2.275625 17.171875 2.828125 L 16 4 L 20 8 L 21.171875 6.828125 C 22.275875 5.724125 22.275875 3.933125 21.171875 2.828125 C 20.619375 2.275625 19.895625 2 19.171875 2 z M 14.5 5.5 L 3 17 L 3 21 L 7 21 L 18.5 9.5 L 14.5 5.5 z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-500">Your rating</p>
+                        </div>
+                    {% else %}
+                        <button type="button" class="rounded-md bg-indigo-500 px-6 py-2.5 text-lg font-medium text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" 
+                            @click="openRateDialog"
+                        >
+                            Rate
+                        </button>                        
+                    {% endif %}            
                 </div>
 
                 <div>
@@ -71,11 +89,6 @@
                         </span>
                     {% endif %}
                 </h1>
-                <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-md font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" 
-                    @click="reviewMenuOpen = true"
-                >
-                    Submit a review
-                </button>
             </div>
             {% if reviews|length > 0 %}
                 {% for review in reviews %}
@@ -86,7 +99,7 @@
                             </div>
                         </div>
                         <div class="flex items-center mb-1">
-                            {% for i in range(0, 5) %}
+                            {% for i in range(0, 4) %}
                                 <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none">
                                     <g> <rect width="24" height="24" /> 
                                         <path class="{{ review.rating > i ? 'fill-indigo-400' : 'none' }}" d="M11.5245 4.46353C11.6741 4.00287 12.3259 4.00287 12.4755 4.46353L13.9084 8.87336C13.9753 9.07937 14.1673 9.21885 14.3839 9.21885H19.0207C19.505 9.21885 19.7064 9.83866 19.3146 10.1234L15.5633 12.8488C15.3881 12.9761 15.3148 13.2018 15.3817 13.4078L16.8145 17.8176C16.9642 18.2783 16.437 18.6613 16.0451 18.3766L12.2939 15.6512C12.1186 15.5239 11.8814 15.5239 11.7061 15.6512L7.95488 18.3766C7.56303 18.6613 7.03578 18.2783 7.18546 17.8176L8.6183 13.4078C8.68524 13.2018 8.61191 12.9761 8.43667 12.8488L4.68544 10.1234C4.29358 9.83866 4.49497 9.21885 4.97933 9.21885H9.6161C9.83272 9.21885 10.0247 9.07937 10.0916 8.87336L11.5245 4.46353Z" stroke="#818cf8" stroke-linecap="round" stroke-linejoin="round"/> 
@@ -105,63 +118,134 @@
             {% endif %}
         </div>
 
-        {# Rate dialog #}
+        {# Dialog overlay #}
         <div class="relative z-10 text-white" aria-labelledby="modal-title" role="dialog" aria-modal="true" 
-            x-show="rateMenuOpen"
+            x-show="dialogOpen"
         >
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-
             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <div class="relative transform overflow-hidden rounded-lg bg-gray-900 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6 flex flex-col items-center"
-                        @click.outside="rateMenuOpen = false"
+                    {# Rate Dialog #}
+                    <div class="relative transform overflow-hidden rounded-lg bg-gray-900 p-4 text-left shadow-xl transition-all w-full max-w-md sm:max-w-lg md:max-w-2xl sm:p-6"
+                        @click.outside="dialogOpen = false"
                     >
-                        <p class="text-gray-300">{{ movie.title }}</p>
-                        {% include "components/star-rating.html.twig" %}
-                        <div class="mt-5 sm:mt-6">
-                            <button type="button" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-6 py-3 text-lg font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                                Rate
-                            </button>
+                        <div class="flex justify-center">
+                            <p class="text-2xl text-indigo-400">{{ movie.title }}</p>
+                            <svg height="24" width="24" viewBox="0 -960 960 960" class="fill-red-400 cursor-pointer absolute top-3 right-3" @click="dialogOpen = false">
+                                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                            </svg>
                         </div>
+                        {% if reviewForm %}
+                            <div class="text-red-400">
+                                {{ form_errors(reviewForm) }}
+                            </div>
+                            {{ form_start(reviewForm, { attr: { id: 'review_form', class: 'flex flex-col gap-5' } }) }}
+                                {{ form_row(reviewForm.rating) }}
+                                <div id="review_form_isReview_container">
+                                    {{ form_widget(reviewForm.isReview ) }}
+                                    {{ form_label(reviewForm.isReview ) }}
+                                    {{ form_errors(reviewForm.isReview ) }}
+                                </div>
+
+                                {% if reviewForm.title is defined %}
+                                    <div id="review_form_title_container">
+                                        {{ form_label(reviewForm.title ) }}
+                                        {{ form_errors(reviewForm.title ) }}
+                                        {{ form_widget(reviewForm.title ) }}
+                                    </div>
+
+                                    <div id="review_form_content_container">
+                                        {{ form_label(reviewForm.content) }}
+                                        {{ form_errors(reviewForm.content) }}
+                                        {{ form_widget(reviewForm.content) }}
+                                    </div>
+                                {% endif %}
+                                <button type="submit" id="review_form_submit_button" class="justify-self-center self-center flex mt-5 justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                                    Submit
+                                </button>
+                            {{ form_end(reviewForm) }}
+                        {% endif %}
                     </div>
                 </div>  
             </div>
         </div>
-
-        {# Review dialog #}
-        <div class="relative z-10 text-white" aria-labelledby="modal-title" role="dialog" aria-modal="true" x-show="reviewMenuOpen">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-            <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-                <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <div class="relative transform overflow-hidden rounded-lg bg-gray-900 p-4 text-left shadow-xl transition-all sm:my-8 w-full sm:max-w-xl md:max-w-2xl sm:p-6"
-                        @click.outside="reviewMenuOpen = false"
-                    >
-                        <form @submit.prevent class="flex flex-col gap-6">
-                            <div>
-                                <label for="title" class="block text-sm font-medium leading-6">Title</label>
-                                <div class="mt-2">
-                                    <input type="text" name="title" id="title" class="bg-gray-800 block w-full rounded-md border-0 py-1.5 text-gray-300 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                                </div>
-                            </div>
-                        
-                            <div>
-                                <label for="comment" class="block text-sm font-medium leading-6">Review</label>
-                                <div class="mt-2">
-                                    <textarea rows="4" name="comment" id="comment" class="bg-gray-800 block w-full rounded-md border-0 py-1.5 text-gray-300 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
-                                </div>
-                            </div>
-
-                            <div name="rating" class="mt-2">
-                                {% include "components/star-rating.html.twig" %}
-                            </div>
-
-                            <button type="submit" class="rounded-md bg-indigo-500 px-6 py-2.5 text-lg font-medium text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
-                                Submit
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>    
+    <script>
+        const isLogged = !!"{{ is_granted('IS_AUTHENTICATED_REMEMBERED') }}"
+        
+        if (isLogged) {
+            const form = document.getElementById('review_form')
+            const isReviewField = document.getElementById('review_form_isReview')
+            const csrfToken = document.getElementById('review_form__token')
+            const submitButton = document.getElementById('review_form_submit_button')
+            const userRating = '{{ userReview ? userReview.rating : null}}'
+
+            const updateForm = async (data, url, method) => {
+                const req = await fetch(url, {
+                    method: method,
+                    body: data,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'charset': 'utf-8'
+                    }
+                });
+
+                const text = await req.text();
+
+                return text;
+            };
+
+            const parseTextToHtml = (text) => {
+                const parser = new DOMParser();
+                const html = parser.parseFromString(text, 'text/html');
+
+                return html;
+            };
+
+            // This request does not create any objects. It's only purpose is
+            // determining if dynamic form fields should be rendered or not.
+            const changeMode = async (e) => {
+                const body = new URLSearchParams();
+                body.append(e.target.getAttribute('name'), e.target.checked)
+                body.append(csrfToken.getAttribute('name'), csrfToken.value)
+                body.append('changeViewRequest', 1)
+                if (userRating) {
+                    body.append('review_form[rating]', userRating)
+                }
+                const updateFormResponse = await updateForm(
+                    body, form.getAttribute('action'), 
+                    form.getAttribute('method'),
+                );
+                const html = parseTextToHtml(updateFormResponse);
+
+                const title = html.getElementById('review_form_title_container')
+                const content = html.getElementById('review_form_content_container')
+
+                if (isReviewField.checked) {
+                    form.insertBefore(title, submitButton)
+                    form.insertBefore(content, submitButton)
+                }
+                else {
+                    document.getElementById('review_form_title_container').remove()
+                    document.getElementById('review_form_content_container').remove()
+                }
+            };
+
+            isReviewField.addEventListener('change', (e) => changeMode(e));
+        }
+        
+        function data() {
+            return {
+                dialogOpen: !!'{{ not reviewForm or reviewForm.vars.valid ? false : true }}',
+                openRateDialog() {
+                    if (isLogged) {
+                        this.dialogOpen = true
+                    }
+                    else {
+                        window.location.href="{{ path('login_page') }}"
+                    }
+                }
+            }
+        }
+    </script>
 {% endblock %}
